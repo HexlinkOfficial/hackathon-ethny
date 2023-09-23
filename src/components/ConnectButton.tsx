@@ -1,20 +1,31 @@
 import { Button, Profile, mq } from '@ensdomains/thorin'
 import { ConnectButton as ConnectButtonBase } from '@rainbow-me/rainbowkit'
 import { useDisconnect } from 'wagmi'
+import { useRouter } from "next/router"
+import { useState, useEffect } from "react";
 import styled, { css } from 'styled-components'
+import { useENSAnnoymousLogin } from '@/hooks/useENSAnnoymousLogin'
 
-const StyledButton = styled(Button)`
-  ${({ theme }) => css`
-    width: fit-content;
+// const StyledButton = styled(Button)`
+//   ${({ theme }) => css`
+//     width: fit-content;
 
-    ${mq.xs.min(css`
-      min-width: ${theme.space['45']};
-    `)}
-  `}
-`
+//     ${mq.xs.min(css`
+//       min-width: ${theme.space['45']};
+//     `)}
+//   `}
+// `
 
-export function ConnectButton() {
+interface connectButtonprops {
+  ens: string
+  ensOwner: string
+}
+
+export function ConnectButton(props: connectButtonprops) {
+  const { ens, ensOwner } = props;
   const { disconnect } = useDisconnect()
+  const router = useRouter()
+  const ensAnonymousLogin = useENSAnnoymousLogin()
 
   return (
     <ConnectButtonBase.Custom>
@@ -28,6 +39,18 @@ export function ConnectButton() {
       }) => {
         const ready = mounted
         const connected = ready && account && chain
+
+        useEffect(() => {
+          if (connected) {
+            if (account.address == ensOwner) {
+              ensAnonymousLogin(ens)
+              router.push("/");
+            } else {
+              console.log("wrong address")
+              disconnect()
+            }
+          }
+        }, [connected])
 
         return (
           <div
@@ -43,43 +66,44 @@ export function ConnectButton() {
             {(() => {
               if (!connected) {
                 return (
-                  <StyledButton shape="rounded" onClick={openConnectModal}>
+                  <Button onClick={openConnectModal}>
                     Connect
-                  </StyledButton>
+                  </Button>
                 )
               }
 
               if (chain.unsupported) {
                 return (
-                  <StyledButton
+                  <Button
                     shape="rounded"
                     colorStyle="redPrimary"
                     onClick={openChainModal}
                   >
                     Wrong network
-                  </StyledButton>
+                  </Button>
                 )
               }
 
               return (
-                <Profile
-                  address={account.address}
-                  ensName={account.ensName || undefined}
-                  avatar={account.ensAvatar || undefined}
-                  onClick={openAccountModal}
-                  dropdownItems={[
-                    {
-                      label: 'Copy Address',
-                      color: 'text',
-                      onClick: () => copyToClipBoard(account.address),
-                    },
-                    {
-                      label: 'Disconnect',
-                      color: 'red',
-                      onClick: () => disconnect(),
-                    },
-                  ]}
-                />
+                // <Profile
+                //   address={account.address}
+                //   ensName={account.ensName || undefined}
+                //   avatar={account.ensAvatar || undefined}
+                //   onClick={openAccountModal}
+                //   dropdownItems={[
+                //     {
+                //       label: 'Copy Address',
+                //       color: 'text',
+                //       onClick: () => copyToClipBoard(account.address),
+                //     },
+                //     {
+                //       label: 'Disconnect',
+                //       color: 'red',
+                //       onClick: () => disconnect(),
+                //     },
+                //   ]}
+                // />
+                <></>
               )
             })()}
           </div>

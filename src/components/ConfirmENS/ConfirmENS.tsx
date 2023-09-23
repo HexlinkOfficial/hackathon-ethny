@@ -1,6 +1,7 @@
 import { useEnsAddress } from 'wagmi'
 import { HexlinkModal } from '../HexlinkModal'
 import { Typography, Button, Spinner } from '@ensdomains/thorin'
+import { ConnectButton } from '@/components/ConnectButton'
 
 interface ConfirmENSProps {
   visible: boolean;
@@ -35,13 +36,7 @@ export function ConfirmENS(props: ConfirmENSProps) {
         <Typography weight="light" className='mt-4 text-center'>
           Auth:<br /><b>wallet</b>
         </Typography>
-        <Button
-          as="a"
-          onClick={ENSlogin}
-          className='mt-8 mb-1'
-        >
-          Connect
-        </Button>
+        <ConnectButton ens={info.value} ensOwner={ensAddress!}/>
       </div>
     </HexlinkModal>
   )

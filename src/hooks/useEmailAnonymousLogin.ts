@@ -8,7 +8,7 @@ export function useEmailAnonymousLogin() {
 
   const emailAnonymousLogin = useCallback(
     (email: string) => {
-      const normalizedEmail = normalizeInput(email);
+      const normalizedEmail = normalizeInput(email).value;
       const user = {
         provider: "hexlink.io",
         idType: "mailto",

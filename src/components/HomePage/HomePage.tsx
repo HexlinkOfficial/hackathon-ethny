@@ -9,6 +9,8 @@ import { getCroppedAddress } from "@/utils/getCroppedAddress"
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import { useClearUserInfo } from "@/hooks/useClearUserInfo"
 import { useRouter } from "next/router"
+import { ConnectButton } from '@/components/ConnectButton'
+import { WalletInfo } from '@/components/WalletInfo'
 
 export function HomePage() {
   const userInfo = useGetUserInfo()
@@ -27,32 +29,36 @@ export function HomePage() {
     <>
       <Layout>
         <Container as="main">
-          <Card title="User Account">
-            <S.UserAddress
-              className="flex items-center justify-between ml-2"
-              onClick={() => {
-                if (!userInfo?.address) {
-                  return;
-                }
-                copyToClipboard(userInfo.address);
-                showMessage({
-                  messageBody: "Copied",
-                });
-              }}
-            >
-              <Typography>{croppedAddress}</Typography>
-              <ContentCopyIcon className="ml-2" />
-            </S.UserAddress>
-            <Button
-              colorStyle="redPrimary"
-              onClick={() => {
-                clearUserInfo();
-                router.push("/signin");
-              }}
-            >
-              Logout
-            </Button>
-          </Card>
+          {userInfo?.idType == "mailto" ? (
+            <Card title="User Account">
+              <S.UserAddress
+                className="flex items-center justify-between ml-2"
+                onClick={() => {
+                  if (!userInfo?.address) {
+                    return;
+                  }
+                  copyToClipboard(userInfo.address);
+                  showMessage({
+                    messageBody: "Copied",
+                  });
+                }}
+              >
+                <Typography>{croppedAddress}</Typography>
+                <ContentCopyIcon className="ml-2" />
+              </S.UserAddress>
+            </Card>
+          ) : (
+            <WalletInfo />
+          )}
+          <Button
+            colorStyle="redPrimary"
+            onClick={() => {
+              clearUserInfo();
+              router.push("/signin");
+            }}
+          >
+            Logout
+          </Button>
         </Container>
       </Layout>
     </>

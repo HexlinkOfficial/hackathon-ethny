@@ -19,7 +19,7 @@ export function RegisterModal(props: RegisterModalProps) {
 
   const registerUsername = () => {
     try {
-      emailAnonymousLogin(info.email)
+      emailAnonymousLogin(info.value)
       router.push("/")
     } catch (e) {
       showMessage({
