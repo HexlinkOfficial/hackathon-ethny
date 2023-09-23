@@ -1,14 +1,16 @@
+import { useState } from 'react'
+import { useDebounce } from 'usehooks-ts'
+import { isAddress } from 'viem/utils'
 import { Button, Card, Input, Spinner, EnsSVG, Heading, Typography } from '@ensdomains/thorin'
 import { NextSeo } from 'next-seo'
 import styled, { css } from 'styled-components'
 import { useEnsAddress } from 'wagmi'
 import { Container, Layout } from '@/components/templates'
-import { useState } from 'react'
-import { useDebounce } from 'usehooks-ts'
-import { isAddress } from 'viem/utils'
+import { RegisterModal } from '@/components/RegisterModal'
 
 export default function Home() {
   const [input, setInput] = useState('')
+  const [openRegisterModal, setOpenRegisterModal] = useState(false)
   const debouncedInput = useDebounce(input, 500)
 
   // Resolve potential ENS names (dot separated strings)
@@ -55,10 +57,10 @@ export default function Home() {
           </ExamplesGrid>
         </Container> */}
         <Container as="main">
-          <Card title="Name/Address Input">
+          <Card title="Username Input">
             <Input
               label="Email or ENS name"
-              placeholder="peter.eth"
+              placeholder="peter@hexlink.io or peter.eth"
               description={ensAddress && address}
               suffix={ensAddressIsLoading && <Spinner />}
               onChange={(e) => setInput(e.target.value)}
@@ -67,15 +69,26 @@ export default function Home() {
             {/* <Button disabled={!address} colorStyle="greenPrimary">
               {!address ? 'No Address' : 'Nice!'}
             </Button> */}
-            <Button as="a" href="/input">
-              View
+            <Button 
+              as="a"
+              onClick={() => setOpenRegisterModal(true)}
+            >
+              Continue
             </Button>
+            {/* <Button as="a" href="/input">
+              View
+            </Button> */}
           </Card>
         </Container>
 
         {/* Placeholder for the footer */}
         <footer />
       </Layout>
+      <RegisterModal 
+        visible={openRegisterModal}
+        onClose={() => setOpenRegisterModal(false)}
+        info={{email: input}}
+      />
     </>
   )
 }
