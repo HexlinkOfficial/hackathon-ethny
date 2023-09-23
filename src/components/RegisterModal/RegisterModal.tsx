@@ -1,5 +1,8 @@
 import { HexlinkModal } from '../HexlinkModal'
 import { Typography, Button } from '@ensdomains/thorin'
+import { useEmailAnonymousLogin } from '@/hooks/useEmailAnonymousLogin'
+import { useRouter } from "next/router"
+import { useAlertMessage } from "@/hooks/useAlertMessage"
 
 interface RegisterModalProps {
   visible: boolean;
@@ -10,6 +13,24 @@ interface RegisterModalProps {
 export function RegisterModal(props: RegisterModalProps) {
   const { visible, onClose, info } = props;
 
+  const router = useRouter()
+  const emailAnonymousLogin = useEmailAnonymousLogin()
+  const { message, showMessage } = useAlertMessage()
+
+  const registerUsername = () => {
+    try {
+      emailAnonymousLogin(info.email)
+      router.push("/")
+    } catch (e) {
+      showMessage({
+        messageBody: `Login failed, please check your email.`,
+        messageSeverity: "error",
+      });
+      console.error(e);
+    }
+    onClose();
+  }
+
   return (
     <HexlinkModal open={visible} onDismiss={onClose}>
       <div className='mt-2 w-full'>
@@ -17,17 +38,17 @@ export function RegisterModal(props: RegisterModalProps) {
           Register your username
         </Typography>
         <Typography weight="light" className='mt-4 text-center'>
-          Email input:<br/><b>{info.email}</b>
+          Email input:<br/><b>{info.value}</b>
         </Typography>
         <Typography weight="light" className='mt-4 text-center'>
-          Username registered:<br/><b>{info.email}.hex.eth</b>
+          Username registered:<br/><b>{info.value}.hex.eth</b>
         </Typography>
         <Typography weight="light" className='mt-4 text-center'>
           Default Auth:<br /><b>email OTP</b>
         </Typography>
         <Button
           as="a"
-          onClick={onClose}
+          onClick={registerUsername}
           className='mt-8 mb-1'
         >
           Register

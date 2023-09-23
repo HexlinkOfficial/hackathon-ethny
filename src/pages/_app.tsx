@@ -10,6 +10,7 @@ import { chains, wagmiConfig } from '@/providers'
 import { DefaultSeo } from 'next-seo'
 import { useIsMounted } from '@/hooks/useIsMounted'
 import SEO from '../next-seo.config'
+import { RecoilRoot } from "recoil"
 
 export default function App({ Component, pageProps }: AppProps) {
   const isMounted = useIsMounted()
@@ -17,11 +18,13 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig config={wagmiConfig}>
       <ThemeProvider theme={lightTheme}>
-        <ThorinGlobalStyles />
-        <RainbowKitProvider chains={chains}>
-          <DefaultSeo {...SEO} />
-          {isMounted && <Component {...pageProps} />}
-        </RainbowKitProvider>
+        <RecoilRoot>
+          <ThorinGlobalStyles />
+          <RainbowKitProvider chains={chains}>
+            <DefaultSeo {...SEO} />
+            {isMounted && <Component {...pageProps} />}
+          </RainbowKitProvider>
+        </RecoilRoot>
       </ThemeProvider>
     </WagmiConfig>
   )
