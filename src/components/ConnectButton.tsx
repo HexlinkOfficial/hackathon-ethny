@@ -19,10 +19,11 @@ import { useENSAnnoymousLogin } from '@/hooks/useENSAnnoymousLogin'
 interface connectButtonprops {
   ens: string
   ensOwner: string
+  updateParent: (status: boolean) => void
 }
 
 export function ConnectButton(props: connectButtonprops) {
-  const { ens, ensOwner } = props;
+  const { ens, ensOwner, updateParent } = props;
   const { disconnect } = useDisconnect()
   const router = useRouter()
   const ensAnonymousLogin = useENSAnnoymousLogin()
@@ -47,6 +48,7 @@ export function ConnectButton(props: connectButtonprops) {
               router.push("/");
             } else {
               console.log("wrong address")
+              updateParent(false)
               disconnect()
             }
           }

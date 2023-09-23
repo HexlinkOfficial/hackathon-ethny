@@ -29,36 +29,36 @@ export function HomePage() {
     <>
       <Layout>
         <Container as="main">
-          {userInfo?.idType == "mailto" ? (
             <Card title="User Account">
-              <S.UserAddress
-                className="flex items-center justify-between ml-2"
+              {userInfo?.idType == "mailto" ? (
+                <S.UserAddress
+                  className="flex items-center justify-between ml-2"
+                  onClick={() => {
+                    if (!userInfo?.address) {
+                      return;
+                    }
+                    copyToClipboard(userInfo.address);
+                    showMessage({
+                      messageBody: "Copied",
+                    });
+                  }}
+                >
+                  <Typography>{croppedAddress}</Typography>
+                  <ContentCopyIcon className="ml-2" />
+                </S.UserAddress>
+              ) : (
+                <WalletInfo />
+              )}
+              <Button
+                colorStyle="redPrimary"
                 onClick={() => {
-                  if (!userInfo?.address) {
-                    return;
-                  }
-                  copyToClipboard(userInfo.address);
-                  showMessage({
-                    messageBody: "Copied",
-                  });
+                  clearUserInfo();
+                  router.push("/signin");
                 }}
               >
-                <Typography>{croppedAddress}</Typography>
-                <ContentCopyIcon className="ml-2" />
-              </S.UserAddress>
+                Logout
+              </Button>
             </Card>
-          ) : (
-            <WalletInfo />
-          )}
-          <Button
-            colorStyle="redPrimary"
-            onClick={() => {
-              clearUserInfo();
-              router.push("/signin");
-            }}
-          >
-            Logout
-          </Button>
         </Container>
       </Layout>
     </>
