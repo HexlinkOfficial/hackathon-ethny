@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+// import { MuiOtpInput } from "mui-one-time-password-input";
 
 const SendAmountInput = styled.div`
   .SendAmountInput-number {
@@ -26,6 +27,18 @@ const ReceiveAccount = styled.div`
   border: 2px solid #076ae0;
   padding: 12px;
 `;
+
+// const OtpInput = styled(MuiOtpInput)`
+//   display: flex;
+//   gap: 20px;
+//   max-width: 320px;
+//   margin-inline: auto;
+//   .MuiOtpInput-TextField {
+//   }
+//   .MuiOutlinedInput-input {
+//     padding: 7.5px 0;
+//   }
+// `;
 
 export const S = {
   ReceiveAccount,

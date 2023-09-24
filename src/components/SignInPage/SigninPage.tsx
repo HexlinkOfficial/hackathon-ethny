@@ -28,9 +28,11 @@ export function SignInPage() {
       setUsername(result)
       if (result.type == "ens") {
         console.log("ens")
+        setOpenRegisterModal(false)
         setOpenENSLoginModal(true)
       } else if (result.type == "email") {
         console.log("email")
+        setOpenRegisterModal(false)
         setOpenRegisterModal(true)
       }
     }
@@ -73,7 +75,6 @@ export function SignInPage() {
               // suffix={ensAddressIsLoading && <Spinner />}
               onChange={(e) => setInput(e.target.value)}
             />
-
 
             {/* <Button disabled={!address} colorStyle="greenPrimary">
               {!address ? 'No Address' : 'Nice!'}

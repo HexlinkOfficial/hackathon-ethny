@@ -3,6 +3,7 @@ import { HexlinkModal } from '../HexlinkModal'
 import { Typography, Button, Spinner } from '@ensdomains/thorin'
 import { ConnectButton } from '@/components/ConnectButton'
 import { useState, useEffect } from "react"
+import { getProvider } from "@/utils/getProvider"
 
 interface ConfirmENSProps {
   visible: boolean;
@@ -13,11 +14,20 @@ interface ConfirmENSProps {
 export function ConfirmENS(props: ConfirmENSProps) {
   const { visible, onClose, info } = props
   const [openAlertModal, setOpenAlertModal] = useState(false)
+  const provider = getProvider()
 
   const { data: ensAddress, isLoading: ensAddressIsLoading } = useEnsAddress({
     name: info.value,
     chainId: 1,
   })
+
+  // useEffect(() => {
+  //   const fetchENS = async () => {
+  //     const ensaddress = await provider.resolveName(info.value)
+  //     console.log("sepolia: ", ensaddress)
+  //   }
+  //   fetchENS()
+  // }, [])
 
   const ENSlogin = () => {
     console.log("ENS address: ", ensAddress)
@@ -45,7 +55,7 @@ export function ConfirmENS(props: ConfirmENSProps) {
               ENS:<br /><b>{info.value}</b>
             </Typography>
             <Typography weight="light" className='mt-4 text-center'>
-              ENS Owner:<br /><b>{ensAddressIsLoading ? <Spinner /> : ensAddress}</b>
+              ENS Owner:<br /><b>{ensAddress}</b>
             </Typography>
             <Typography weight="light" className='mt-4 text-center'>
               Auth:<br /><b>wallet</b>
