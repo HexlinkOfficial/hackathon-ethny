@@ -34,7 +34,7 @@ export async function authVerifyOtp(account: string, code: string) {
 export async function authSign(account: string, message: string, bearToken: string) {
   const result = await callFirebaseFunction("authSign", {
     account: account,
-    message: account
+    message: message
   },
   bearToken);
   return result.data.signature;

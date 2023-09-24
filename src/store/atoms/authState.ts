@@ -7,6 +7,7 @@ interface AuthState {
   handle: string;
   name: string;
   jwt: string;
+  address?: string;
   secondFactor?: string;
 }
 

@@ -7,7 +7,7 @@ export function useEmailAnonymousLogin() {
   const setAuth = useSetRecoilState(authState);
 
   const emailAnonymousLogin = useCallback(
-    (email: string) => {
+    (email: string, address: string) => {
       const normalizedEmail = normalizeInput(email).value;
       const user = {
         provider: "hexlink.io",
@@ -16,6 +16,7 @@ export function useEmailAnonymousLogin() {
         handle: normalizedEmail,
         name: `mailto:${normalizedEmail}`,
         jwt: "",
+        address: address
       };
       setAuth(user)
     },

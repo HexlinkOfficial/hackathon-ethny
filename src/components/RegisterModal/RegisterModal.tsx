@@ -4,9 +4,8 @@ import { useEmailAnonymousLogin } from '@/hooks/useEmailAnonymousLogin'
 import { useRouter } from "next/router"
 import { useAlertMessage } from "@/hooks/useAlertMessage"
 import { useCountDown } from "@/hooks/useCountDown"
-import { authRegister, genAndSendOtpForDAuth, validateOtpForDAuth } from "@/services/auth"
+import { authRegister, genAndSendOtpForDAuth, validateOtpForDAuth, authSign } from "@/services/auth"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { S } from "./styled.RegisterModal"
 import { MuiOtpInput } from "mui-one-time-password-input"
 import styled from "@emotion/styled"
 
@@ -14,6 +13,18 @@ interface RegisterModalProps {
   visible: boolean;
   onClose: () => void;
   info: any;
+}
+
+interface WorkerRequest {
+  name: string
+  owner: string
+  addresses?: Record<string, string | undefined> | undefined
+  texts?: Record<string, string | undefined> | undefined
+  contenthash?: string | undefined
+  signature: {
+    message: string
+    hash: string
+  }
 }
 
 export function RegisterModal(props: RegisterModalProps) {
@@ -27,6 +38,7 @@ export function RegisterModal(props: RegisterModalProps) {
   const router = useRouter()
   const emailAnonymousLogin = useEmailAnonymousLogin()
   const { message, showMessage } = useAlertMessage()
+  const ENSDomain = info.value.replace("@", "at").split(".")[0] + "2.offchaindemo.eth"
 
   const handleChange = (value: string) => {
     setOtp(value);
@@ -38,6 +50,69 @@ export function RegisterModal(props: RegisterModalProps) {
       const result = await validateOtpForDAuth(otp)
       setJWT(result.jwt)
       console.log("jwt: ", result.jwt)
+      // register
+      const r = await authRegister(
+        info.value,
+        ENSDomain,
+        result.jwt)
+      console.log(r)
+      // assign ENS
+      const r2 = await authSign(
+        r.account,
+        "Register " + ENSDomain,
+        result.jwt
+      )
+
+      const requestBody: WorkerRequest = {
+        name: ENSDomain,
+        owner: r.account!,
+        addresses: { '60': r.account },
+        texts: undefined,
+        signature: {
+          hash: r2,
+          message: "Register " + ENSDomain,
+        },
+      }
+      /** For 201 */
+      type UserCreated = { id: string; name: string };
+
+      /** For 400 */
+      type BadRequest = { code: "bad_request"; message: string };
+
+      /** Response type intersection */
+      type UserResponse =
+        | (Omit<Response, "json"> & {
+          status: 201;
+          json: () => UserCreated | PromiseLike<UserCreated>;
+        })
+        | (Omit<Response, "json"> & {
+          status: 400;
+          json: () => BadRequest | PromiseLike<BadRequest>;
+        });
+
+      /** Marshalling stream to object with narrowing */
+      const marshalResponse = (res: UserResponse) => {
+        if (res.status === 201) return res.json();
+        if (res.status === 400) return res.json();
+        return Error("Unhandled response code");
+      };
+
+      /** Coerce Response to UserResponse */
+      const responseHandler = (response: Response) => {
+        const res = response as UserResponse;
+        return marshalResponse(res);
+      };
+
+      const resultData = fetch(`https://ens-gateway.gregskril.workers.dev/set`, {
+        method: "POST",
+        body: JSON.stringify(requestBody),
+      }).then((res) => responseHandler(res));
+
+      console.log(await resultData)
+
+      emailAnonymousLogin(info.value, r.account)
+      router.push("/")
+      setOpenVerifyOtpModal(false)
     } catch (error: any) {
       console.error(error)
     }
@@ -75,13 +150,7 @@ export function RegisterModal(props: RegisterModalProps) {
 
   const registerUsername = async () => {
     try {
-      // verify email
-      setOpenVerifyOtpModal(true);
-      // register
-      // const r = await authRegister(info.value, info.value.replace("@","at").split(".")[0] + ".offchaindemo.eth")
-      // console.log(r);
-      // emailAnonymousLogin(info.value)
-      // router.push("/")
+      setOpenVerifyOtpModal(true)
     } catch (e) {
       showMessage({
         messageBody: `Login failed, please check your email.`,
@@ -127,7 +196,7 @@ export function RegisterModal(props: RegisterModalProps) {
             Email input:<br /><b>{info.value}</b>
           </Typography>
           <Typography weight="light" className='mt-4 text-center'>
-            ENS registered:<br /><b>{info.value.replace("@", "at").split(".")[0]}.offchaindemo.eth</b>
+            ENS registered:<br /><b>{ENSDomain}</b>
           </Typography>
           <Typography weight="light" className='mt-4 text-center'>
             Auth:<br /><b>email OTP</b>

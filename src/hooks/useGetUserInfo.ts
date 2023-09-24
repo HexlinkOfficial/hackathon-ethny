@@ -1,6 +1,6 @@
 import { authState } from "@/store/atoms/authState";
 import { tokenState } from "@/store/atoms/tokenState";
-import { getAccountAddress, getAccountVersion } from "@/web3/account";
+import { getAccountVersion } from "@/web3/account";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useAsync } from "react-use";
@@ -28,7 +28,7 @@ export function useGetUserInfo() {
         return;
       }
       const name = auth.idType + ":" + auth.handle;
-      const address = await getAccountAddress(name);
+      const address = auth.address ? auth.address : "";
       const version = await getAccountVersion(name);
       setUserInfo({
         address,
